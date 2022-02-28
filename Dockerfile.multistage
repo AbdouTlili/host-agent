@@ -1,0 +1,23 @@
+#syntax=docker/dockerfile:1
+
+FROM golang:1.16-buster AS build 
+
+WORKDIR /app
+
+COPY go.mod /app/
+COPY go.sum /app/
+
+RUN go mod download
+
+COPY *.go /app/
+
+RUN go build -o /server
+
+## stage 2 
+
+FROM debian:buster 
+
+WORKDIR /
+
+COPY --from=build /server /server /
+
